@@ -1,4 +1,4 @@
-use actix_web::web::{Data, Query};
+use actix_web::web::{Data};
 use actix_web::{get, post, web, HttpResponse, Responder};
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
