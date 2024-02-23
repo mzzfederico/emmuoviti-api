@@ -22,7 +22,7 @@ I also want to design the ma.
 
 ## Some performance numbers
 
-Here is what my laptop did, a Macbook Pro 2019 with 2.3 GHz 8-Core Intel Core i9 and 32 GB 2667 MHz DDR4.
+Here is what my laptop did, a Macbook Pro 2019 with 2.3 GHz 6-Core Intel Core i7 and 32 GB 2667 MHz DDR4.
 
 ```bash
 ➜  ~ autocannon -c 100 -d 5 -p 10 http://localhost:8080/pois\?page\=202 
