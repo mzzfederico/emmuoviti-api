@@ -1,29 +1,28 @@
-use actix_web::web::{Data};
+use actix_web::web::{Data, Query};
 use actix_web::{get, post, web, HttpResponse, Responder};
-use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use web::Json;
+use crate::models::Poi;
 
-#[derive(sqlx::FromRow, Deserialize, Serialize, Debug)]
-struct Poi {
-    id: Option<i32>,
-    name: Option<String>,
-    category_id: Option<i32>,
-    address: Option<String>,
-    latitude: Option<f64>,
-    longitude: Option<f64>,
-    created_at: Option<NaiveDateTime>,
-    updated_at: Option<NaiveDateTime>,
+#[derive(Deserialize)]
+struct Pagination {
+    page: Option<i64>,
+    per_page: Option<i64>,
 }
 
 #[get("/pois")]
-async fn get_poi(pool: Data<PgPool>) -> impl Responder {
+async fn get_poi(pool: Data<PgPool>, query: Query<Pagination>) -> impl Responder {
     let pois = sqlx::query_as!(
         Poi,
         "
             SELECT *
             FROM pois
-        "
+            LIMIT $1
+            OFFSET $2
+        ",
+        query.per_page.unwrap_or(10),
+        query.page.unwrap_or(0) * query.per_page.unwrap_or(10)
     )
     .fetch_all(&**pool) // -> Vec<Poi>
     .await;
@@ -67,27 +66,22 @@ async fn get_poi_by_radius(
 }
 
 #[post("/pois")]
-async fn create_poi(pool: Data<PgPool>, json: web::Json<Poi>) -> impl Responder {
-    let poi = sqlx::query_as!(
-        Poi,
-        "
-            INSERT INTO pois (name, category_id, address, latitude, longitude)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING *
-        ",
-        json.name,
-        json.category_id,
-        json.address,
-        json.latitude,
-        json.longitude
-    )
-    .fetch_one(&**pool) // -> Poi
-    .await;
-
-    match poi {
-        Ok(poi) => HttpResponse::Ok().json(poi),
-        Err(e) => {
-            HttpResponse::InternalServerError().body(format!("Failed to execute query: {:?}", e))
-        }
-    }
+async fn create_poi(pool: Data<PgPool>, json: Json<Poi>) -> impl Responder {
+    // let poi = sqlx::query_as!(
+    //     Poi,
+    //     "
+    //         INSERT INTO pois (name, category_id, address, latitude, longitude)
+    //         VALUES ($1, $2, $3, $4, $5)
+    //         RETURNING *
+    //     ",
+    //     json.name,
+    //     json.category_id,
+    //     json.address,
+    //     json.latitude,
+    //     json.longitude,
+    // )
+    // .fetch_one(&**pool) // -> Poi
+    // .await;
+    HttpResponse::InternalServerError().body("tbd.".to_string())
+    //HttpResponse::InternalServerError().body(format!("Failed to execute query: {:?}", e));
 }
