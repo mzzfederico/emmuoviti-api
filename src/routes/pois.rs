@@ -1,6 +1,6 @@
 use actix_web::web::{Data, Query};
 use actix_web::{get, post, web, HttpResponse, Responder};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 use sqlx::PgPool;
 use web::Json;
 use crate::models::Poi;
@@ -66,7 +66,7 @@ async fn get_poi_by_radius(
 }
 
 #[post("/pois")]
-async fn create_poi(pool: Data<PgPool>, json: Json<Poi>) -> impl Responder {
+async fn create_poi(_pool: Data<PgPool>, _json: Json<Poi>) -> impl Responder {
     // let poi = sqlx::query_as!(
     //     Poi,
     //     "

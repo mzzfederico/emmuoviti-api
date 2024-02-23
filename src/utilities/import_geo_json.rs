@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 use std::ops::Add;
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, Pool, Postgres, Row};
-use sqlx::postgres::PgQueryResult;
+use sqlx::{Pool, Postgres};
+
 use crate::models::{Poi, PoiAddress};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -72,14 +72,14 @@ pub async fn import_geo_json(_geo_json: String, db_pool: &Pool<Postgres>) -> any
             "Italy",
             properties.addr_postcode.unwrap_or("".to_string()),
             properties.addr_housenumber.unwrap_or("".to_string())
-        ).fetch_one(&*db_pool).await?;
+        ).fetch_one(db_pool).await?;
 
         let longitude: f64 = feature.geometry.coordinates[0];
         let latitude: f64 = feature.geometry.coordinates[1];
         let name = properties.name.unwrap_or("Unknown".to_string());
 
         let unique_id = properties.id;
-        let slug = name.to_lowercase().replace(" ", "-").add("-").add(&unique_id);
+        let slug = name.to_lowercase().replace(' ', "-").add("-").add(&unique_id);
 
         // type geog not supported (yet!) by sqlx for now
         // reverting to querying directly
@@ -96,7 +96,7 @@ pub async fn import_geo_json(_geo_json: String, db_pool: &Pool<Postgres>) -> any
             latitude,
             longitude,
             slug
-        ).fetch_one(&*db_pool).await?;
+        ).fetch_one(db_pool).await?;
 
         println!("{:?}", _poi);
     }
