@@ -2,6 +2,7 @@ mod utilities;
 mod routes;
 mod models;
 
+use actix_cors::Cors;
 use actix_web::web::Data;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
@@ -52,7 +53,11 @@ async fn main() -> anyhow::Result<()> {
 
     println!("Starting server");
     HttpServer::new(move || {
+        let cors = Cors::default()
+              .allow_any_origin();
+
         App::new()
+            .wrap(cors)
             .wrap(actix_web::middleware::Logger::default())
             .app_data(Data::new(pool.clone()))
             .service(routes::pois::get_poi)

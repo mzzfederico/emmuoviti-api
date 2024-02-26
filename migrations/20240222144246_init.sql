@@ -1,4 +1,4 @@
-CREATE EXTENSION postgis;
+-- CREATE EXTENSION postgis;
 
 -- Create table for POI categories
 CREATE TABLE poi_categories
